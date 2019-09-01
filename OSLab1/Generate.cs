@@ -24,9 +24,9 @@ namespace OSLab1
         }
         public int[] durations;
         public int[] intervals;
-        private readonly int minDurationValue = 4;
-        private readonly int maxDurationValue = 8;
-        private readonly int minIntervalValue = 3;
-        private readonly int maxIntervalValue = 9;
+        private readonly int minDurationValue = 3;
+        private readonly int maxDurationValue = 9;
+        private readonly int minIntervalValue = 4;
+        private readonly int maxIntervalValue = 3;
     }
 }

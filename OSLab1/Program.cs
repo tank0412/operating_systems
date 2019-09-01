@@ -10,6 +10,7 @@ namespace OSLab1
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Lab 1 for OS by Bukhtiarov Roman P3318/P3418 Var 3");
             int n = 10;
             Generate gen = new Generate();
             gen.genValue(n);
