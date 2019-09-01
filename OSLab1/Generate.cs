@@ -6,9 +6,12 @@ namespace OSLab1
 {
     public class Generate
     {
+        bool isInterval;
         public void genValue(int count)
         {
+            isInterval = false;
             this.durations = RandomValuesGenerate(count, minDurationValue, maxDurationValue);
+            isInterval = true;
             this.intervals = RandomValuesGenerate(count, minIntervalValue, maxIntervalValue);
             this.intervals[0] = 0;
         }
@@ -18,15 +21,23 @@ namespace OSLab1
             Random R = new Random();
             for (int i = 0; i < count; i++)
             {
-                GeneratedArray[i] = R.Next(minValue, maxValue);
+                if (isInterval != true)
+                {
+                    GeneratedArray[i] = R.Next(minValue, maxValue);
+                }
+                else {
+                    int Temp = R.Next(minValue, maxValue);
+                    minValue = Temp;
+                    GeneratedArray[i] = Temp;
+                }
             }
             return GeneratedArray;
         }
         public int[] durations;
         public int[] intervals;
-        private readonly int minDurationValue = 3;
+        private readonly int minDurationValue = 3; //Длительность
         private readonly int maxDurationValue = 9;
-        private readonly int minIntervalValue = 4;
-        private readonly int maxIntervalValue = 3;
+        private readonly int minIntervalValue = 1; //Интервал (ТОЛЬКО по возрастанию)
+        private readonly int maxIntervalValue = 7;
     }
 }
