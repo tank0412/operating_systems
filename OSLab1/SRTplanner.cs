@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OSLab1
 {
-    class FCFSplanner : Planner
+    class SRTplanner : Planner
     {
         public override void Planning(int count, int[] durations, int[] intervals)
         {
@@ -16,7 +16,7 @@ namespace OSLab1
             this.durations = durations;
             this.intervals = intervals;
             // инициализация новых переменных
-            // регистр состояний процессов (0 - не выполняется, 1 - ожидает, 2 - выполняется)
+            // регистр состояний процессов (0 - не выполняется, 1 - ожидает, 2 - выполняется, 3 - приостановлен)
             int[] ProcessStatus = new int[count];
             // указатель на активный (выполняющийся) процесс
             int indexOfActiveProcess = 0;
@@ -33,17 +33,36 @@ namespace OSLab1
                 // если подоспел новый процесс
                 if (currentInterval == 0 && indexOfNextProcess < count)
                 {
+                    if (currentDuration > durations[indexOfNextProcess]) { //если длит текущего процесса большо нового
+                        ProcessStatus[indexOfActiveProcess] = 3; // помечаем текущий процесс, как приостановленный
+                        ProcessStatus[indexOfNextProcess] = 1; //помещаем текущий (бывший следущий) процесс, как ожидающий
+                        durations[indexOfActiveProcess] = currentDuration; //присваиваем оставшееся время текущему процессы, перед его остановкой
+                        currentDuration = durations[indexOfNextProcess]; // тек длительность - длит нового процесса
+                        // добавляем новый процесс в очередь
+                        TurnList.Add(indexOfNextProcess);
+                        this.maxQueueLength = Math.Max(this.maxQueueLength, TurnList.Count);
+
+                        int temp = indexOfNextProcess;
+                        indexOfActiveProcess = indexOfNextProcess; // начинаем выполнять след процессор немедленно
+                        indexOfNextProcess = temp; //ставим текущий процессор в начало очереди (вроде)
+      
+
+                    }
+                    else { //если меньше
                     // добавляем его в очередь
                     TurnList.Add(indexOfNextProcess);
                     this.maxQueueLength = Math.Max(this.maxQueueLength, TurnList.Count);
                     // помечаем его как "ожидающий"
                     ProcessStatus[indexOfNextProcess] = 1;
-                    // и ожидаем следующего
-                    if (++indexOfNextProcess < count)
-                    {
-                        currentInterval = this.intervals[indexOfNextProcess];
                     }
                 }
+
+                // и ожидаем следующего
+                if (++indexOfNextProcess < count)
+                {
+                    currentInterval = this.intervals[indexOfNextProcess];
+                }
+
                 // если закончился активный процесс
                 if (currentDuration == 0)
                 {
