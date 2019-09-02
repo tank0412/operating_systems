@@ -26,7 +26,7 @@ namespace OSLab1
                     GeneratedArray[i] = R.Next(minValue, maxValue);
                 }
                 else {
-                    int Temp = R.Next(minValue, maxValue);
+                    int Temp = R.Next(minValue, maxValue); // потому что запрещены временные парадоксы
                     minValue = Temp;
                     GeneratedArray[i] = Temp;
                 }

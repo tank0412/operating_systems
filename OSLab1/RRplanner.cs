@@ -37,47 +37,47 @@ namespace OSLab1
                 {
                     TurnList.Add(indexOfNextProcess);
                     this.maxQueueLength = Math.Max(this.maxQueueLength, TurnList.Count);
-                    ProcessStatus[indexOfNextProcess] = 1;
-                    indexOfNextProcess++;
+                    ProcessStatus[indexOfNextProcess] = 1; //пометить процесс как ожидающий
+                    indexOfNextProcess++; 
                 }
-                periodEnds = periodleft == 0;
-                durationEnds = durations[indexOfActiveProcess] == 0;
-                if (periodEnds || durationEnds)
+                periodEnds = periodleft == 0; //проверка закончился ли квант
+                durationEnds = durations[indexOfActiveProcess] == 0; //проверка закончилась ли длительность процесса
+                if (periodEnds || durationEnds) //если да
                 {
-                    if (!durationEnds)
+                    if (!durationEnds) //длительность не закончилась
                     {
                         TurnList.Add(indexOfActiveProcess);
-                        ProcessStatus[indexOfActiveProcess] = 1;
+                        ProcessStatus[indexOfActiveProcess] = 1; //пометить процесс как ожидающий
                     }
                     else
                     {
-                        ProcessStatus[indexOfActiveProcess] = 0;
+                        ProcessStatus[indexOfActiveProcess] = 0; //пометить процесс как не выполнящийся
                         finishedcount++;
                     }
-                    TurnList.Remove(indexOfActiveProcess);
-                    periodleft = period;
-                    if (TurnList.Count > 0)
+                    TurnList.Remove(indexOfActiveProcess); //удаляет процесс
+                    periodleft = period; //сохранения оставшегося кванта 
+                    if (TurnList.Count > 0) //если есть еще процессы
                     {
-                        indexOfActiveProcess = GetNextFromTurn(TurnList);
-                        ProcessStatus[indexOfActiveProcess] = 2;
+                        indexOfActiveProcess = GetNextFromTurn(TurnList); //берем новый процесс из списка (его индекс)
+                        ProcessStatus[indexOfActiveProcess] = 2; //помечаем его как выполняющийся
                     }
                 }
 
 
-                if (indexOfNextProcess < intervals.Length)
+                if (indexOfNextProcess < intervals.Length) //если индекс след. процесса меньше кол-ва интервалов
                 {
-                    --intervals[indexOfNextProcess];
+                    --intervals[indexOfNextProcess]; //уменьшаем интервал след процесса
                 }
-                if (TurnList.Count > 0)
+                if (TurnList.Count > 0) //если в очереди есть процессы
                 {
-                    --durations[indexOfActiveProcess];
+                    --durations[indexOfActiveProcess]; //уменьшаем длительность текущего процесса 
                 }
                 periodleft--;
                 // заполняем информационную часть новыми состояниями                
                 for (int i = 0; i < count; ++i)
                 {
-                    if (ProcessStatus[i] == 1) ++waitTime[i];
-                    if (ProcessStatus[i] == 2) ++activeTime[i];
+                    if (ProcessStatus[i] == 1) ++waitTime[i]; //если процесс ожидает увеличиваем время ожидания
+                    if (ProcessStatus[i] == 2) ++activeTime[i]; //если процесс выполняется увеличиваем время выполнения
                 }
             }
         }
