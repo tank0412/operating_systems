@@ -30,11 +30,11 @@ namespace OSLab1
             Console.WriteLine();
             Planner planner1 = new SRTplanner();
             planner1.Planning(n, durations, intervals);
-            Planner planner2 = new RRplanner();
+            Planner planner2 = new SPNplanner();
             planner2.Planning(n, durations, intervals);
             Console.WriteLine("SRT:\nAverage time - " + planner1.AverageTurnroundTime + "\n" + "Waiting - " + planner1.AverageWaitTime + "\n" +
                 "Max count process in queue - " + planner1.MaxQueueLength + "\n" +
-                "RR2:\nAverage time - " + planner2.AverageTurnroundTime + "\n" + "Waiting - " + planner2.AverageWaitTime + "\n" +
+                "SPN:\nAverage time - " + planner2.AverageTurnroundTime + "\n" + "Waiting - " + planner2.AverageWaitTime + "\n" +
                 "Max count process in queue - " + planner2.MaxQueueLength + "\n");
             Console.ReadKey();
         }
