@@ -7,19 +7,20 @@ using namespace std;
 
 int main()
 {
-	HANDLE hMutex[2];
+	HANDLE hMutex[3];
 	HANDLE hMsg, hEnd;
 
 	hMutex[0] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC1");
 	hMutex[1] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC2");
+	hMutex[2] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC3");
 
-	if (hMutex[0] == NULL || hMutex[1] == NULL)
+	if (hMutex[0] == NULL || hMutex[1] == NULL || hMutex[2] == NULL)
 		printf("Can't open Mutex\r\n");
 
 	FILE* f;	// file w/ message
 	char fName[20];	// filename
 
-	printf("Waiting for ending other Readers...\r\n");
+	printf("Waiting for ending other Parents...\r\n");
 	while (true)	// while all mutex' is busy
 	{
 		if (WaitForSingleObject(hMutex[0], 500) == WAIT_OBJECT_0)	// MutexA gotcha
@@ -40,8 +41,7 @@ int main()
 	LPTSTR endPtr;
 	int msgCount = _tcstod(buf, &endPtr);	// to int
 
-	while (i < msgCount)	// wait all msgs
-	{
+
 		printf("Waiting message...\r\n");
 
 		DWORD dwRes = WaitForSingleObject(hMsg, INFINITE);
@@ -56,8 +56,6 @@ int main()
 		_tprintf("Message recieved: %s\r\n", buf);	// print msg
 
 		ResetEvent(hMsg);	// reset event, wait new msg
-		i++;
-	}
 
 	SetEvent(hEnd);	// end reader process
 	printf("\r\nClose in 5 seconds...\r\n");
@@ -65,8 +63,10 @@ int main()
 	// close handles
 	ReleaseMutex(hMutex[0]);
 	ReleaseMutex(hMutex[1]);
+	ReleaseMutex(hMutex[2]);
 	CloseHandle(hMutex[0]);
 	CloseHandle(hMutex[1]);
+	CloseHandle(hMutex[2]);
 	CloseHandle(hMsg);
 	CloseHandle(hEnd);
 

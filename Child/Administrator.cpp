@@ -37,6 +37,7 @@ int main()
 	int i = 0;
 	while (i < pCount)	// run r/w count
 	{
+		//printf("%d", pCount);
 		i++;
 		STARTUPINFO si, si2;	// some vars
 		PROCESS_INFORMATION pi, pi2;
@@ -62,8 +63,8 @@ int main()
 	// open end session events
 	int ends = 0;
 	HANDLE hEnd[2];
-	hEnd[0] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "EndP1");
-	hEnd[1] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "EndC1");
+	hEnd[0] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "EndP");
+	hEnd[1] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "EndC");
 
 	while (ends < pCount)	// wait all sessions end
 	{
@@ -71,7 +72,7 @@ int main()
 		ResetEvent(hEnd[0]);	// reset events for next session
 		ResetEvent(hEnd[1]);
 		ends++;
-		printf("Writer and Reader session closed\r\n");
+		printf("Child and Parent session closed\r\n");
 	}
 
 	printf("\r\nInput any char to exit...\r\n");
@@ -80,8 +81,10 @@ int main()
 	// close all handles
 	CloseHandle(hMutexP1);
 	CloseHandle(hMutexP2);
+	CloseHandle(hMutexP3);
 	CloseHandle(hMutexC1);
 	CloseHandle(hMutexC2);
+	CloseHandle(hMutexC3);
 
 	CloseHandle(hMsgOfFourDigits);
 	CloseHandle(hEndP);
@@ -92,7 +95,7 @@ int main()
 
 bool getRaW()
 {
-	printf("Enter number of Readers/Writers (max 10): ");
+	printf("Enter number of Parents/Children (max 10): ");
 
 	if (scanf_s("%d", &pCount) == 0)
 		return false;
@@ -100,13 +103,13 @@ bool getRaW()
 	if (pCount > 10)
 	{
 		pCount = 10;
-		printf("Number of Readers/Writers set to 10 (max)\r\n");
+		printf("Number of Parents/Children  set to 10 (max)\r\n");
 	}
 
 	if (pCount < 1)
 	{
 		pCount = 1;
-		printf("Number of Readers/Writers set to 1 (min)\r\n");
+		printf("Number of Parents/Children  set to 1 (min)\r\n");
 	}
 
 	return true;
