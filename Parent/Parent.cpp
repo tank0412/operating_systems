@@ -53,10 +53,11 @@ int main()
 
 	while (i < msgCount)	// wait all msgs
 	{
-		printf("Enter %d message(-s):\r\n", msgCount - i);	// show info
-		_tscanf("%s", buf, 255);	// get text in buffer
+		//printf("Enter %d message(-s):\r\n", msgCount - i);	// show info
+		//_tscanf("%s", buf, 255);	// get text in buffer
 
 		f = fopen(fName, "wt");	// open file
+		TCHAR buf[] = { '1', '2', '3', '4', '\0' };
 		fwrite(buf, sizeof(TCHAR), _tcslen(buf), f);	// save txt
 		fclose(f);	// close
 
