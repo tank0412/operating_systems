@@ -33,12 +33,6 @@ int main()
 			strcpy(fName, "MessageA.txt");	// map filename
 			break;
 		}
-		if (WaitForSingleObject(hMutex[1], 500) == WAIT_OBJECT_0)	// same
-		{
-			hMsg = OpenEvent(EVENT_MODIFY_STATE, FALSE, "MessageB");
-			strcpy(fName, "MessageB.txt");
-			break;
-		}
 	}
 
 	hEnd = OpenEvent(EVENT_MODIFY_STATE, FALSE, "EndP");	// open end writer event

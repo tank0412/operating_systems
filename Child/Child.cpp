@@ -28,12 +28,6 @@ int main()
 			strcpy(fName, "MessageA.txt");	// file for message is MessageA.txt
 			break;
 		}
-		if (WaitForSingleObject(hMutex[1], 500) == WAIT_OBJECT_0)	// same fro B
-		{
-			hMsg = OpenEvent(EVENT_ALL_ACCESS, FALSE, "MessageB");
-			strcpy(fName, "MessageB.txt");
-			break;
-		}
 	}
 
 	hEnd = OpenEvent(EVENT_MODIFY_STATE, FALSE, "EndC");	// open end reader event

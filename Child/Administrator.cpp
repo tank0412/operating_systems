@@ -7,7 +7,7 @@ using namespace std;
 int msgCount, pCount;	// messages count, r/w count
 TCHAR buf[MAX_BUF] = { 0 };
 HANDLE hMutexP1, hMutexP2, hMutexP3, hMutexC1, hMutexC2, hMutexC3, hMsgOfFourDigits;	// mutex for maximum 2 current r/w
-HANDLE hMsgA, hMsgB;	// msg events
+HANDLE hMsgA;	// msg events
 HANDLE hEndP, hEndC;	// end session events
 
 bool getRaW();
@@ -30,7 +30,6 @@ int main()
 	hMutexC3 = CreateMutex(NULL, FALSE, "MutexC3");
 
 	hMsgA = CreateEvent(NULL, TRUE, FALSE, "MessageA");
-	hMsgB = CreateEvent(NULL, TRUE, FALSE, "MessageB");
 
 	hMsgOfFourDigits = CreateEvent(NULL, TRUE, FALSE, "MessageOfFourDigits");
 	hEndP = CreateEvent(NULL, TRUE, FALSE, "EndP");
@@ -89,7 +88,6 @@ int main()
 	CloseHandle(hMutexC2);
 
 	CloseHandle(hMsgA);
-	CloseHandle(hMsgB);
 	CloseHandle(hEndP);
 	CloseHandle(hEndC);
 
