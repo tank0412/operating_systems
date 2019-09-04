@@ -17,15 +17,15 @@ int main()
 		printf("Can't open Mutex\r\n");
 
 	FILE* f;	// file w/ message
-	char fName[16];	// filename
+	char fName[20];	// filename
 
 	printf("Waiting for ending other Readers...\r\n");
 	while (true)	// while all mutex' is busy
 	{
 		if (WaitForSingleObject(hMutex[0], 500) == WAIT_OBJECT_0)	// MutexA gotcha
 		{
-			hMsg = OpenEvent(EVENT_ALL_ACCESS, FALSE, "MessageA");	// open MessageA event
-			strcpy(fName, "MessageA.txt");	// file for message is MessageA.txt
+			hMsg = OpenEvent(EVENT_ALL_ACCESS, FALSE, "MsgOfFourDigits");	// open MessageA event
+			strcpy(fName, "MsgOfFourDigits.txt");	// file for message is MessageA.txt
 			break;
 		}
 	}

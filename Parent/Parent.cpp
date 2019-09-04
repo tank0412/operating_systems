@@ -22,15 +22,15 @@ int main()
 		printf("Can't open Mutex\r\n");
 
 	FILE* f;	// file for message
-	char fName[16];	// filename
+	char fName[20];	// filename
 
 	printf("Waiting for ending other Writers...\r\n");
 	while (true)	// wait while other writers end it's work
 	{
 		if (WaitForSingleObject(hMutex[0], 500) == WAIT_OBJECT_0)	// get MessageA
 		{
-			hMsg = OpenEvent(EVENT_MODIFY_STATE, FALSE, "MessageA");	// open this event
-			strcpy(fName, "MessageA.txt");	// map filename
+			hMsg = OpenEvent(EVENT_MODIFY_STATE, FALSE, "MsgOfFourDigits");	// open this event
+			strcpy(fName, "MsgOfFourDigits.txt");	// map filename
 			break;
 		}
 	}
