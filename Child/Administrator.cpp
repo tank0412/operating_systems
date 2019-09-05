@@ -1,13 +1,14 @@
 #include <windows.h>
 #include <iostream>
 #include <strsafe.h>
+#include <tchar.h>
 #define MAX_BUF 256
 using namespace std;
 
 int msgCount, pCount;	// messages count, r/w count
 TCHAR buf[MAX_BUF] = { 0 };
 HANDLE hMutexP1, hMutexP2, hMutexP3, hMutexC1, hMutexC2, hMutexC3, hMsgOfFourDigits;	// mutex for maximum 2 current r/w
-HANDLE hEndP, hEndC;	// end session events
+HANDLE hMsg, hEndP, hEndC;	// end session events
 
 bool getRaW();
 bool getMSG();
@@ -35,6 +36,7 @@ int main()
 	SetEnvironmentVariable("msgCount", buf);
 
 	int i = 0;
+
 	while (i < pCount)	// run r/w count
 	{
 		//printf("%d", pCount);
@@ -46,6 +48,20 @@ int main()
 		ZeroMemory(&si2, sizeof(STARTUPINFO));
 		si2.cb = sizeof(STARTUPINFO);
 
+		char fName[20];
+		hMsg = OpenEvent(EVENT_MODIFY_STATE, FALSE, "MsgOfFourDigits");	// open this event
+		if (hMsg == NULL)
+			printf("Can't open Event\r\n");
+		strcpy(fName, "MsgOfFourDigits.txt");	// map filename
+		FILE* f = fopen(fName, "wt");	// open file
+		TCHAR buf[] = { '1', '2', '3', '4', '\0' };
+		fwrite(buf, sizeof(TCHAR), _tcslen(buf), f);	// save txt
+		fclose(f);	// close
+
+		SetEvent(hMsg);	// msg send
+		Sleep(1000);	// wait a little for reader work
+		printf("Sending message...\r\n");
+
 		// start writer and reader
 		if (!CreateProcess("C:/Users/Roman-PC/Source/Repos/OSLab2/Debug/Parent.exe", NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))	 // relative path
 		{
@@ -53,11 +69,26 @@ int main()
 			return GetLastError();
 		}
 
+		CloseHandle(hMsg);	// close event, wait new msg
+
+		hMsg = OpenEvent(EVENT_MODIFY_STATE, FALSE, "MsgOfFourDigits");	// open this event
+		if (hMsg == NULL)
+			printf("Can't open Event\r\n");
+		strcpy(fName, "MsgOfFourDigits.txt");	// map filename
+		f = fopen(fName, "wt");	// open file
+		fwrite(buf, sizeof(TCHAR), _tcslen(buf), f);	// save txt
+		fclose(f);	// close
+
+		SetEvent(hMsg);	// msg send
+		Sleep(1000);	// wait a little for reader work
+		printf("Sending message...\r\n");
+
 		if (!CreateProcess("C:/Users/Roman-PC/Source/Repos/OSLab2/Debug/Child.exe", NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si2, &pi2))
 		{
 			printf("Can't start Child.exe\r\n");
 			return GetLastError();
 		}
+		CloseHandle(hMsg);
 	}
 
 	// open end session events
@@ -85,7 +116,7 @@ int main()
 	CloseHandle(hMutexC1);
 	CloseHandle(hMutexC2);
 	CloseHandle(hMutexC3);
-
+	//CloseHandle(hMsg);
 	CloseHandle(hMsgOfFourDigits);
 	CloseHandle(hEndP);
 	CloseHandle(hEndC);

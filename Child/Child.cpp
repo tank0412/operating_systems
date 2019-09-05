@@ -7,14 +7,18 @@ using namespace std;
 
 int main()
 {
-	HANDLE hMutex[3];
+	HANDLE hMutex[3], hMutex2[3];
 	HANDLE hMsg, hEnd;
 
 	hMutex[0] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC1");
 	hMutex[1] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC2");
 	hMutex[2] = OpenMutex(SYNCHRONIZE, FALSE, "MutexC3");
 
-	if (hMutex[0] == NULL || hMutex[1] == NULL || hMutex[2] == NULL)
+	hMutex2[0] = OpenMutex(SYNCHRONIZE, FALSE, "MutexP1");
+	hMutex2[1] = OpenMutex(SYNCHRONIZE, FALSE, "MutexP2");
+	hMutex2[2] = OpenMutex(SYNCHRONIZE, FALSE, "MutexP3");
+
+	if (hMutex[0] == NULL || hMutex[1] == NULL || hMutex[2] == NULL || hMutex2[0] == NULL || hMutex2[1] == NULL || hMutex2[2] == NULL)
 		printf("Can't open Mutex\r\n");
 
 	FILE* f;	// file w/ message
@@ -23,7 +27,7 @@ int main()
 	printf("Waiting for ending other Parents...\r\n");
 	while (true)	// while all mutex' is busy
 	{
-		if (WaitForSingleObject(hMutex[0], 500) == WAIT_OBJECT_0)	// MutexA gotcha
+		if (WaitForSingleObject(hMutex[0], 500) == WAIT_OBJECT_0 && WaitForSingleObject(hMutex2[0], 500) == WAIT_OBJECT_0)	// MutexA gotcha
 		{
 			hMsg = OpenEvent(EVENT_ALL_ACCESS, FALSE, "MsgOfFourDigits");	// open MessageA event
 			strcpy(fName, "MsgOfFourDigits.txt");	// file for message is MessageA.txt
@@ -55,7 +59,7 @@ int main()
 
 		_tprintf("Message recieved: %s\r\n", buf);	// print msg
 
-		ResetEvent(hMsg);	// reset event, wait new msg
+		//ResetEvent(hMsg);	// reset event, wait new msg
 
 	SetEvent(hEnd);	// end reader process
 	printf("\r\nClose in 5 seconds...\r\n");
@@ -64,9 +68,15 @@ int main()
 	ReleaseMutex(hMutex[0]);
 	ReleaseMutex(hMutex[1]);
 	ReleaseMutex(hMutex[2]);
+	ReleaseMutex(hMutex2[0]);
+	ReleaseMutex(hMutex2[1]);
+	ReleaseMutex(hMutex2[2]);
 	CloseHandle(hMutex[0]);
 	CloseHandle(hMutex[1]);
 	CloseHandle(hMutex[2]);
+	CloseHandle(hMutex2[0]);
+	CloseHandle(hMutex2[1]);
+	CloseHandle(hMutex2[2]);
 	CloseHandle(hMsg);
 	CloseHandle(hEnd);
 
