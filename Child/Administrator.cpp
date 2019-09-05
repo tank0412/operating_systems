@@ -59,7 +59,7 @@ int main()
 		fclose(f);	// close
 
 		SetEvent(hMsg);	// msg send
-		Sleep(1000);	// wait a little for reader work
+		Sleep(3000);	// wait a little for reader work
 		printf("Sending message...\r\n");
 
 		// start writer and reader
@@ -80,7 +80,7 @@ int main()
 		fclose(f);	// close
 
 		SetEvent(hMsg);	// msg send
-		Sleep(1000);	// wait a little for reader work
+		Sleep(4000);	// wait a little for reader work
 		printf("Sending message...\r\n");
 
 		if (!CreateProcess("C:/Users/Roman-PC/Source/Repos/OSLab2/Debug/Child.exe", NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si2, &pi2))
