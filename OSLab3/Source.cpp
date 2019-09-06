@@ -2,10 +2,10 @@
 #include <iostream>
 
 using namespace std;
-HANDLE hMultSemaphore = CreateSemaphore(NULL, 0, 1, NULL);
+HANDLE hSumSemaphore = CreateSemaphore(NULL, 0, 1, NULL);
 HANDLE hWorkSemaphore;
 
-struct ArrStruct
+struct ArrStruct //такие структуры. чтобы вместе с массивом хранить и другие данные
 {
 	volatile int* arr;
 	int n;
@@ -15,43 +15,46 @@ struct ArrStruct2
 {
 	volatile int* arr;
 	int n;
-	int a;
 	int rest;
 };
 
 DWORD WINAPI work(ArrStruct2* arrStr) {
-	int* left = new int[arrStr->n];
-	int* right = new int[arrStr->n];
+	int temp; // временная переменная для обмена элементов местами
 
-	int l = 0, r = 0;
+	//cout << "Sourted array: " << endl;
 
-	for (int i = 0; i < arrStr->n; i++) {
-		if (arrStr->arr[i] < arrStr->a)
-			left[l++] = arrStr->arr[i];
-		else
-			right[r++] = arrStr->arr[i];
+// Сортировка массива пузырьком
+	for (int i = 0; i < arrStr->n - 1; i++) {
+		for (int j = 0; j < arrStr->n - i - 1; j++) {
+			if (arrStr->arr[j] > arrStr->arr[j + 1]) {
+				// меняем элементы местами
+				temp = arrStr->arr[j];
+				arrStr->arr[j] = arrStr->arr[j + 1];
+				arrStr->arr[j + 1] = temp;
 
-		ReleaseSemaphore(hWorkSemaphore, 1, NULL);
-		Sleep(arrStr->rest * 1000);
+				//cout << arrStr->arr[i] << endl;
+
+				ReleaseSemaphore(hWorkSemaphore, 1, NULL);
+				Sleep(arrStr->rest * 1000); //отдыхаем, как требуется по ТЗ
+			}
+			else { // if it is false and no need sort - free semaphore to publish element in work
+				ReleaseSemaphore(hWorkSemaphore, 1, NULL);
+			}
+		}
 	}
 
-	for (int i = 0; i < arrStr->n; i++)
-		if (i < l)
-			arrStr->arr[i] = left[i];
-		else
-			arrStr->arr[i] = right[i - l];
 
 	ReleaseSemaphore(hWorkSemaphore, 1, NULL);
 	return 0;
 }
 
-DWORD WINAPI mult(ArrStruct* arrStr) {
-	WaitForSingleObject(hMultSemaphore, INFINITE);
+DWORD WINAPI sum(ArrStruct* arrStr) {
+	WaitForSingleObject(hSumSemaphore, INFINITE);
 
-	int mult = 1;
+	int sum = 0;
 	for (int i = 0; i < arrStr->n; i++)
-		mult *= arrStr->arr[i];
-	cout << endl << "Multiplication = " << mult << endl;
+		sum += arrStr->arr[i];
+	cout << endl << "Sum = " << sum << endl;
 
 	return 0;
 }
@@ -59,7 +62,8 @@ DWORD WINAPI mult(ArrStruct* arrStr) {
 int main() {
 	HANDLE hWork, hMult;
 	DWORD IDWork, IDMult;
-
+	ArrStruct arrStr;
+	ArrStruct2 arrStr2;
 
 	int k;
 	volatile int* arr;
@@ -84,49 +88,44 @@ int main() {
 		arr[i] = b;
 	}
 
+	arrStr.arr = arr;
+	arrStr2.arr = arr;
+
 	cout << "Please enter rest time: ";
 	cin >> rest;
-
-	cout << "Please enter a: ";
-	cin >> a;
 
 	cout << "Source array: " << endl;
 	for (int i = 0; i < n; i++)
 		cout << arr[i] << " ";
 	cout << endl;
 
-	hWorkSemaphore = CreateSemaphore(NULL, 0, n + 1, NULL);
+	hWorkSemaphore = CreateSemaphore(NULL, 0, n+1, NULL); //remove n+1
 
-	ArrStruct arrStr;
+
 	arrStr.n = k;
-	arrStr.arr = arr;
 
-	ArrStruct2 arrStr2;
 	arrStr2.n = n;
-	arrStr2.arr = arr;
-	arrStr2.a = a;
 	arrStr2.rest = rest;
 
 	hWork = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)work, &arrStr2, 0, &IDWork);
-	hMult = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)mult, &arrStr, 0, &IDMult);
+	hMult = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sum, &arrStr, 0, &IDMult);
 
 
-	for (int i = 0; i <= n; i++)
-		WaitForSingleObject(hWorkSemaphore, INFINITE);
 
-	cout << "New array: " << endl;
+	cout << "New array: " << endl; // and sort it one time
 	for (int i = 0; i < n; i++) {
-		cout << arr[i] << " ";
+		WaitForSingleObject(hWorkSemaphore, INFINITE);
+		cout << arrStr.arr[i] << " ";
 	}
 	cout << endl;
 
-	ReleaseSemaphore(hMultSemaphore, 1, NULL);
+	ReleaseSemaphore(hSumSemaphore, 1, NULL);
 
-	CloseHandle(hMultSemaphore);
+	CloseHandle(hSumSemaphore);
 	CloseHandle(hWorkSemaphore);
 	CloseHandle(hMult);
 	CloseHandle(hWork);
-	delete[] arr;
+	//delete[] arr;
 
 
 	system("pause");
